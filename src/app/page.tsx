@@ -109,7 +109,7 @@ function socialsOf(u: User): { label: string; value: string }[] {
 }
 
 /* ================= app ================= */
-export default function PrivChatApp() {
+export default function WenageApp() {
   const [users, setUsers] = useState<User[]>([]);
   const [meId, setMeId] = useState<number | null>(null);
   const [locked, setLocked] = useState(false);
@@ -234,7 +234,7 @@ export default function PrivChatApp() {
     (async () => {
       setLoading(true);
       const list: User[] = await loadUsers();
-      const saved = typeof window !== "undefined" ? Number(localStorage.getItem("privchat_user") || 0) : 0;
+      const saved = typeof window !== "undefined" ? Number(localStorage.getItem("wenage_user") || 0) : 0;
       if (saved && list.find((u) => u.id === saved)) {
         setMeId(saved);
         const full = await fetch(`/api/users?id=${saved}`).then((x) => x.json());
@@ -291,7 +291,7 @@ export default function PrivChatApp() {
   /* ---------- acciones ---------- */
   const login = async (uid: number) => {
     setMeId(uid);
-    localStorage.setItem("privchat_user", String(uid));
+    localStorage.setItem("wenage_user", String(uid));
     setPinInput("");
     const full = await fetch(`/api/users?id=${uid}`).then((x) => x.json());
     await loadUsers();
@@ -302,7 +302,7 @@ export default function PrivChatApp() {
 
   const logout = () => {
     setMeId(null); setLocked(false); setSelChat(null);
-    localStorage.removeItem("privchat_user");
+    localStorage.removeItem("wenage_user");
     setChats([]); setFriends([]); setMedia([]);
   };
 
@@ -497,7 +497,7 @@ export default function PrivChatApp() {
       <div className="grid min-h-screen place-items-center bg-slate-950">
         <div className="text-center">
           <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-2xl"><ShieldCheck size={30} /></div>
-          <p className="font-black text-white">PrivChat</p>
+          <p className="font-black text-white">Wenage</p>
           <p className="mt-1 text-xs text-slate-400">Cifrando tu privacidad…</p>
         </div>
       </div>
@@ -513,7 +513,7 @@ export default function PrivChatApp() {
             <div className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-[28px] bg-gradient-to-br from-indigo-500 via-violet-600 to-fuchsia-600 text-white shadow-[0_20px_60px_rgba(124,58,237,0.45)]">
               <ShieldCheck size={38} />
             </div>
-            <h1 className="text-3xl font-black text-white">PrivChat</h1>
+            <h1 className="text-3xl font-black text-white">Wenage</h1>
             <p className="mx-auto mt-1 max-w-xs text-[13px] leading-relaxed text-slate-400">Mensajería para Android con privacidad total: tú decides quién ve, descarga y captura.</p>
           </div>
 
@@ -602,7 +602,7 @@ export default function PrivChatApp() {
         <div className="flex items-center gap-2.5 px-4 py-2.5">
           <div className="grid h-9 w-9 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white"><ShieldCheck size={18} /></div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[14px] font-black text-white">PrivChat</p>
+            <p className="truncate text-[14px] font-black text-white">Wenage</p>
             <p className="truncate text-[10.5px] text-slate-400">{me.displayName} · <span className="font-mono text-indigo-300">@{me.username}</span></p>
           </div>
           {!me.allowScreenshot && <span title="Anti-captura activo" className="rounded-full bg-emerald-400/15 p-1.5 text-emerald-300"><EyeOff size={14} /></span>}
@@ -1742,7 +1742,7 @@ function AndroidTab() {
 
 OPCIÓN 2 · TWA con Android Studio (publicar en Play Store)
 Requisitos: Android Studio + esta app publicada con HTTPS.
-1. En Android Studio: New Project → "No Activity" → nombre PrivChat, package com.tuempresa.privchat, minSdk 24.
+1. En Android Studio: New Project → "No Activity" → nombre Wenage, package com.tuempresa.wenage, minSdk 24.
 2. Agrega al build.gradle (app):
    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
 3. Crea activity TWA que abra tu URL + assetlinks.json en tu dominio:
@@ -1756,7 +1756,7 @@ Con WebView SÍ puedes usar FLAG_SECURE para impedir capturas del sistema:
 Ver el código MainActivity.kt abajo: pégalo en tu proyecto.`;
 
   const MAIN_ACTIVITY = `// MainActivity.kt — WebView con bloqueo real de capturas (FLAG_SECURE)
-package com.tuempresa.privchat
+package com.tuempresa.wenage
 
 import android.os.Bundle
 import android.webkit.*
@@ -1800,10 +1800,10 @@ class MainActivity : AppCompatActivity() {
   const GRADLE = `// app/build.gradle — dependencias mínimas
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
 android {
-    namespace = "com.tuempresa.privchat"
+    namespace = "com.tuempresa.wenage"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.tuempresa.privchat"
+        applicationId = "com.tuempresa.wenage"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -1822,7 +1822,7 @@ dependencies {
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.tuempresa.privchat",
+    "package_name": "com.tuempresa.wenage",
     "sha256_cert_fingerprints": ["TU_SHA256_DE_FIRMA"]
   }
 }]
@@ -1832,7 +1832,7 @@ dependencies {
   return (
     <div className="anim-in space-y-3">
       <div className="overflow-hidden rounded-3xl border border-indigo-400/25 bg-gradient-to-br from-indigo-600/20 via-slate-900 to-slate-900 p-5">
-        <p className="flex items-center gap-2 text-[15px] font-black text-white"><Smartphone size={18} className="text-indigo-300" /> Lleva PrivChat a Android</p>
+        <p className="flex items-center gap-2 text-[15px] font-black text-white"><Smartphone size={18} className="text-indigo-300" /> Lleva Wenage a Android</p>
         <p className="mt-1 text-[12.5px] leading-relaxed text-slate-300">Esta app <b className="text-white">ya funciona en Android</b> desde el navegador. Elige cómo distribuirla: instalación directa (PWA), ficha de Play Store (TWA) o app nativa con bloqueo real de capturas (WebView + FLAG_SECURE).</p>
         <div className="mt-3 grid grid-cols-3 gap-1.5 text-center text-[11px] font-black">
           <div className="rounded-xl bg-emerald-400/15 p-2.5 text-emerald-200">1 · PWA<br /><span className="font-normal">5 min · sin código</span></div>
@@ -1852,7 +1852,7 @@ dependencies {
 
       <div className="rounded-2xl border border-amber-400/25 bg-amber-400/5 p-4 text-[12px] leading-relaxed text-slate-300">
         <p className="flex items-center gap-1.5 font-black text-amber-200"><AlertTriangle size={14} /> Nota honesta sobre capturas</p>
-        <p className="mt-1">Ninguna app web puede impedir al 100% una foto a la pantalla con otro teléfono. Lo que SÍ hace PrivChat: avisos, bloqueo de menú/descarga, blur ante PrintScreen, y —si la compilas como WebView nativo con el código de arriba— <b>bloqueo de capturas a nivel sistema Android</b> (pantalla negra en screenshots y grabaciones).</p>
+        <p className="mt-1">Ninguna app web puede impedir al 100% una foto a la pantalla con otro teléfono. Lo que SÍ hace Wenage: avisos, bloqueo de menú/descarga, blur ante PrintScreen, y —si la compilas como WebView nativo con el código de arriba— <b>bloqueo de capturas a nivel sistema Android</b> (pantalla negra en screenshots y grabaciones).</p>
       </div>
     </div>
   );

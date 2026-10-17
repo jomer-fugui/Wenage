@@ -1,6 +1,6 @@
 {
-  "name": "PrivChat · Mensajería privada",
-  "short_name": "PrivChat",
+  "name": "Wenage · Mensajería privada",
+  "short_name": "Wenage",
   "description": "Mensajería con privacidad total: PIN, palabra secreta, roles y anti-spam.",
   "start_url": "/",
   "display": "standalone",

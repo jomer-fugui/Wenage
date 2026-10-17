@@ -3,11 +3,11 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PrivChat · Mensajería privada para Android",
+  title: "Wenage · Mensajería privada para Android",
   description:
     "App de mensajería con privacidad total: perfiles, multimedia por audiencia, chats privados, grupos con roles y anti-spam, canales, PIN, palabra secreta de borrado y paquete para Android Studio.",
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "PrivChat" },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Wenage" },
 };
 
 export const viewport: Viewport = {
