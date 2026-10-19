@@ -3,10 +3,18 @@ import { db } from "@/db";
 import { chats, chatMembers, users, messages } from "@/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { makeInvite } from "@/lib/messaging";
+import { isDbReady, dbNotReadyResponse } from "@/lib/db-guard";
 
 export const dynamic = "force-dynamic";
 
+function requireDb() {
+  if (!isDbReady()) return dbNotReadyResponse();
+  return null;
+}
+
 export async function GET(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const { searchParams } = new URL(req.url);
     const userId = Number(searchParams.get("userId"));
@@ -96,6 +104,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const b = await req.json();
     const creatorId = Number(b.creatorId);

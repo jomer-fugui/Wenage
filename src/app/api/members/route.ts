@@ -3,8 +3,14 @@ import { db } from "@/db";
 import { chats, chatMembers, users, customRoles, messages } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { effectivePerms, roleLevel, makeInvite, DEFAULT_ROLE_PERMS } from "@/lib/messaging";
+import { isDbReady, dbNotReadyResponse } from "@/lib/db-guard";
 
 export const dynamic = "force-dynamic";
+
+function requireDb() {
+  if (!isDbReady()) return dbNotReadyResponse();
+  return null;
+}
 
 function permsFor(role: string, customRoleId: number | null, customs: typeof customRoles.$inferSelect[]) {
   if (role.startsWith("custom:")) {
@@ -21,6 +27,8 @@ function permsFor(role: string, customRoleId: number | null, customs: typeof cus
 }
 
 export async function GET(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const { searchParams } = new URL(req.url);
     const chatId = Number(searchParams.get("chatId"));
@@ -48,6 +56,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const b = await req.json();
     const action = String(b.action ?? "");

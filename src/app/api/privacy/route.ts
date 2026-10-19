@@ -2,11 +2,19 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, chatMembers, messages, chatSecrets, chats } from "@/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
+import { isDbReady, dbNotReadyResponse } from "@/lib/db-guard";
 
 export const dynamic = "force-dynamic";
 
+function requireDb() {
+  if (!isDbReady()) return dbNotReadyResponse();
+  return null;
+}
+
 // GET ?userId= → ajustes de privacidad (sin exponer secretos completos)
 export async function GET(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const { searchParams } = new URL(req.url);
     const userId = Number(searchParams.get("userId"));
@@ -73,6 +81,8 @@ async function wipeChat(chatId: number, ownerId: number) {
 }
 
 export async function POST(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const b = await req.json();
     const action = String(b.action ?? "");

@@ -2,10 +2,18 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { pollVotes, polls } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { isDbReady, dbNotReadyResponse } from "@/lib/db-guard";
 
 export const dynamic = "force-dynamic";
 
+function requireDb() {
+  if (!isDbReady()) return dbNotReadyResponse();
+  return null;
+}
+
 export async function POST(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const b = await req.json();
     const pollId = Number(b.pollId);

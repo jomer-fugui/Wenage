@@ -119,6 +119,7 @@ export default function WenageApp() {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<TabId>("chats");
   const [toast, setToast] = useState<string | null>(null);
+  const [dbError, setDbError] = useState<string | null>(null);
 
   const [chats, setChats] = useState<Chat[]>([]);
   const [pending, setPending] = useState<Chat[]>([]);
@@ -201,9 +202,16 @@ export default function WenageApp() {
 
   /* ---------- carga ---------- */
   const loadUsers = useCallback(async () => {
-    const r = await fetch("/api/users").then((x) => x.json());
-    setUsers(r.users ?? []);
-    return r.users ?? [];
+    const r = await fetch("/api/users");
+    if (r.status === 503) {
+      const j = await r.json();
+      setDbError(j.detail ?? "Base de datos no configurada en Vercel.");
+      setUsers([]);
+      return [];
+    }
+    const data = await r.json();
+    setUsers(data.users ?? []);
+    return data.users ?? [];
   }, []);
 
   const loadAll = useCallback(async (uid: number) => {
@@ -597,6 +605,7 @@ export default function WenageApp() {
 
   return (
     <div className={`mx-auto flex min-h-screen w-full max-w-md flex-col bg-slate-950 ${me && !me.allowScreenshot ? "no-select" : ""} ${blurScreen ? "[&_*]:!blur-[2px]" : ""}`}>
+      {dbError && <DbDownBanner msg={dbError} />}
       {/* header Android */}
       <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/95 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="flex items-center gap-2.5 px-4 py-2.5">
@@ -812,6 +821,30 @@ export default function WenageApp() {
   function openAccountSwitch() {
     logout();
   }
+}
+
+function DbDownBanner({ msg }: { msg: string }) {
+  return (
+    <div className="fixed bottom-24 left-1/2 z-[80] w-[min(94vw,460px)] -translate-x-1/2 anim-in">
+      <div className="rounded-2xl border border-rose-500/40 bg-rose-900/95 p-4 text-center shadow-2xl">
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <AlertTriangle size={20} className="text-rose-400" />
+          <span className="font-black text-rose-300">Base de datos no configurada</span>
+        </div>
+        <p className="text-[12px] leading-relaxed text-rose-200">
+          {msg}
+        </p>
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined") window.location.reload();
+          }}
+          className="mt-3 inline-flex items-center gap-1 rounded-xl bg-rose-500 px-3 py-1.5 text-[11.5px] font-black text-white hover:bg-rose-400"
+        >
+          <RefreshCw size={13} /> Volver a intentar
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /* ================= sub-vistas ================= */

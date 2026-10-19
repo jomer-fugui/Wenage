@@ -2,8 +2,14 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, friends, mediaItems, chats, chatMembers, messages, polls, pollVotes, chatSecrets, customRoles } from "@/db/schema";
 import { sql } from "drizzle-orm";
+import { isDbReady, dbNotReadyResponse } from "@/lib/db-guard";
 
 export const dynamic = "force-dynamic";
+
+function requireDb() {
+  if (!isDbReady()) return dbNotReadyResponse();
+  return null;
+}
 
 async function reset() {
   await db.delete(pollVotes);
@@ -22,6 +28,8 @@ async function reset() {
 }
 
 export async function POST() {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     await reset();
 

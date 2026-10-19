@@ -2,8 +2,14 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, chatMembers, messages } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { isDbReady, dbNotReadyResponse } from "@/lib/db-guard";
 
 export const dynamic = "force-dynamic";
+
+function requireDb() {
+  if (!isDbReady()) return dbNotReadyResponse();
+  return null;
+}
 
 function clean(u: Record<string, unknown>) {
   const { appPin, masterSecret, ...rest } = u;
@@ -13,6 +19,8 @@ function clean(u: Record<string, unknown>) {
 }
 
 export async function GET(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -47,6 +55,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const b = await req.json();
     const rawUsername = String(b.username ?? "").trim().toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_.]/g, "");
@@ -76,6 +86,8 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const b = await req.json();
     const id = Number(b.id);

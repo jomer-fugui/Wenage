@@ -2,8 +2,14 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { mediaItems, users } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { isDbReady, dbNotReadyResponse } from "@/lib/db-guard";
 
 export const dynamic = "force-dynamic";
+
+function requireDb() {
+  if (!isDbReady()) return dbNotReadyResponse();
+  return null;
+}
 
 function canView(item: typeof mediaItems.$inferSelect, viewerId: number | null): boolean {
   if (item.visibility === "public") return true;
@@ -20,6 +26,8 @@ function canView(item: typeof mediaItems.$inferSelect, viewerId: number | null):
 }
 
 export async function GET(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const { searchParams } = new URL(req.url);
     const ownerId = searchParams.get("ownerId") ? Number(searchParams.get("ownerId")) : null;
@@ -41,6 +49,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const b = await req.json();
     const ownerId = Number(b.ownerId);
@@ -69,6 +79,8 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const b = await req.json();
     const id = Number(b.id);
@@ -92,6 +104,8 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const guard = requireDb();
+  if (guard) return guard;
   try {
     const { searchParams } = new URL(req.url);
     const id = Number(searchParams.get("id"));
